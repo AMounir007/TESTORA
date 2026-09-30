@@ -1,0 +1,7 @@
+testora_smoke:
+  image: maven:3-eclipse-temurin-21
+  script:
+    - mvn -B test -Denv=qa -Dgroups=smoke
+  artifacts:
+    when: always
+    paths: [target/testora]

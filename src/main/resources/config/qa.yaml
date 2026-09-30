@@ -1,0 +1,5 @@
+base.url: https://qa.example.com
+api.base.url: https://api.qa.example.com
+browser: chrome
+headless: "true"
+ai.mode: offline   # normal | ai-unavailable | offline
