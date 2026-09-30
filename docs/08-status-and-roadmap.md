@@ -33,7 +33,7 @@ This page is deliberately honest about what exists.
 
 ## Not implemented yet
 
-AI test and test-data generation, AI suggestions for missing API scenarios, requirement-to-test mapping, Swagger 2 and advanced OpenAPI support, Shadow DOM helpers, per-channel wait policies in YAML, self-generated documentation, Docker Compose for Grid and Appium, Playwright/visual/accessibility plugins, distributed workers, AI-proposed locator candidates, a command-line switch for history-based test selection.
+AI test and test-data generation, AI suggestions for missing API scenarios, requirement-to-test mapping, Swagger 2 and advanced OpenAPI support, Shadow DOM helpers, self-generated documentation, Docker Compose for Grid and Appium, Playwright/visual/accessibility plugins, distributed workers, AI-proposed locator candidates, a command-line switch for history-based test selection.
 
 ## Suggested next steps
 

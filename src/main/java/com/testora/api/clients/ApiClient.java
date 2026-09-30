@@ -8,6 +8,7 @@ import com.testora.core.utilities.Masker;
 import com.testora.evidence.EvidenceService;
 import com.testora.observability.Metrics;
 import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
 import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.module.jsv.JsonSchemaValidator;

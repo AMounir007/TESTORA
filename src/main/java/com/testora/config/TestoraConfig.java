@@ -53,5 +53,16 @@ public final class TestoraConfig {
         return v;
     }
 
-    public WaitPolicy webWait() { return WaitPolicy.webDefaults(); }
+    public WaitPolicy webWait() { return policy("web", WaitPolicy.webDefaults()); }
+
+    public WaitPolicy mobileWait() { return policy("mobile", WaitPolicy.mobileDefaults()); }
+
+    public WaitPolicy apiWait() { return policy("api", WaitPolicy.apiDefaults()); }
+
+    private final java.util.concurrent.ConcurrentHashMap<String, WaitPolicy> policies =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+    private WaitPolicy policy(String channel, WaitPolicy defaults) {
+        return policies.computeIfAbsent(channel, c -> WaitPolicy.resolve(c, defaults, key -> string(key, null)));
+    }
 }

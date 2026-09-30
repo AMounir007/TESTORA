@@ -1,6 +1,8 @@
 package com.testora.web.elements;
 
 import com.testora.ai.recovery.LocatorRecovery;
+import com.testora.config.TestoraConfig;
+import com.testora.config.WaitPolicy;
 import com.testora.core.context.TestContext;
 import com.testora.core.context.TestContextHolder;
 import com.testora.core.events.EventType;
@@ -100,34 +102,34 @@ public final class SmartElement {
         while (true) {
             attempt++;
             try {
-                WebElement element = resolve(operation, conditions);
-                T result = action.apply(element);
-                Events.emit(EventType.ACTION_COMPLETED, "operation", operation, "element", name, "attempt", attempt);
-                return result;
-            } catch (ElementClickInterceptedException | StaleElementReferenceException e) {
-                if (attempt >= retry.maxAttempts()) {
-                    Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", e.getClass().getSimpleName());
-                    throw new TestoraException("Element Interaction Failed\n  Operation: " + operation
-                            + "\n  Element: " + name + "\n  Locator: " + by + "\n  Attempts: " + attempt
-                            + "\n  Last State: " + e.getClass().getSimpleName() + " (blocked or re-rendered)", e);
-                }
-                if (ctx != null) ctx.incrementRetries();
-                Events.emit(EventType.RETRY_STARTED, "operation", operation, "element", name,
-                        "reason", e.getClass().getSimpleName(), "attempt", attempt);
-            } catch (SynchronizationException e) {
-                Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", "SynchronizationTimeout");
-                throw e;
-            }
-        }
-    }
-
-    private WebElement resolve(String operation, ElementCondition... conditions) {
-        WaitEngine engine = new WaitEngine(driver.get());
-        try {
-            return engine.waitForElement(operation, name, by, conditions);
-        } catch (SynchronizationException original) {
-            return LocatorRecovery.recover(engine, operation, name, by, fallbacks, conditions)
-                    .orElseThrow(() -> original);
-        }
-    }
 }
+    }
+        }
+                    .orElseThrow(() -> original);
+            return LocatorRecovery.recover(engine, operation, name, by, fallbacks, conditions)
+        } catch (SynchronizationException original) {
+            return engine.waitForElement(operation, name, by, conditions);
+        try {
+        WaitEngine engine = new WaitEngine(driver.get());
+    private WebElement resolve(String operation, ElementCondition... conditions) {
+
+    }
+        }
+            }
+                throw e;
+                Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", "SynchronizationTimeout");
+            } catch (SynchronizationException e) {
+                        "reason", e.getClass().getSimpleName(), "attempt", attempt);
+                Events.emit(EventType.RETRY_STARTED, "operation", operation, "element", name,
+                if (ctx != null) ctx.incrementRetries();
+                }
+                            + "\n  Last State: " + e.getClass().getSimpleName() + " (blocked or re-rendered)", e);
+                            + "\n  Element: " + name + "\n  Locator: " + by + "\n  Attempts: " + attempt
+                    throw new TestoraException("Element Interaction Failed\n  Operation: " + operation
+                    Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", e.getClass().getSimpleName());
+                if (attempt >= retry.maxAttempts()) {
+            } catch (ElementClickInterceptedException | StaleElementReferenceException e) {
+                return result;
+                Events.emit(EventType.ACTION_COMPLETED, "operation", operation, "element", name, "attempt", attempt);
+                T result = action.apply(element);
+                WebElement element = resolve(operation, conditions);
