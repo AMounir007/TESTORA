@@ -1,5 +1,8 @@
 # TESTORA — Quality Engineering Platform
 
+[![testora](https://github.com/AMounir007/TESTORA/actions/workflows/ci.yml/badge.svg)](https://github.com/AMounir007/TESTORA/actions/workflows/ci.yml)
+
+
 Deterministic first. Intelligent second. AI third.
 
 **Full documentation: [docs/README.md](docs/README.md)** — Getting Started, Writing Tests, Configuration, Architecture,

@@ -40,7 +40,7 @@ Flakiness results are only meaningful after roughly 10 or more runs per test.
 
 CI agents start clean, so history is lost unless you keep the file. Examples:
 
-- **GitHub Actions:** cache or upload `.testora/history.jsonl` and restore it before the run.
+- **GitHub Actions:** the provided workflow already restores and saves `.testora/` with the cache action (see [11](11-continuous-integration.md)).
 - **GitLab CI:** add `.testora/` to `cache` paths.
 - **Jenkins:** archive it and copy it back from the last successful build.
 

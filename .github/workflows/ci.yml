@@ -1,20 +1,76 @@
 name: testora
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 5 * * 1"   # weekly: catches dependency drift
+
+permissions:
+  contents: read
+
 jobs:
-  smoke:
+  build-and-smoke:
     runs-on: ubuntu-latest
-    services:
-      selenium:
-        image: selenium/standalone-chrome:latest
-        ports: ["4444:4444"]
-        options: --shm-size=2g
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      # Keep execution history between runs so flaky/trend analysis works in CI.
+      - name: Restore history
+        uses: actions/cache/restore@v4
+        with:
+          path: .testora
+          key: testora-history-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            testora-history-${{ github.ref_name }}-
+            testora-history-
+
+      # Offline platform tests only: no browser, device, application or AI needed.
+      - name: Build and run smoke tests
+        run: mvn -B -ntp verify -Denv=qa -Dgroups=smoke
+
+      - name: Save history
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .testora
+          key: testora-history-${{ github.ref_name }}-${{ github.run_id }}
+
+      - name: Upload TESTORA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testora-report
+          path: target/testora
+          if-no-files-found: ignore
+
+      - name: Upload surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports
+          if-no-files-found: ignore
+
+  dependency-report:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: 21, cache: maven }
-      - run: mvn -B test -Denv=qa -Dgroups=smoke -Dgrid.url=http://localhost:4444
-        env:
-          DEMO_PASSWORD: ${{ secrets.DEMO_PASSWORD }}
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Show available dependency and plugin updates
+        run: |
+          mvn -B -ntp versions:display-property-updates versions:display-dependency-updates | tee dependency-updates.txt
       - uses: actions/upload-artifact@v4
-        if: always()
-        with: { name: testora-report, path: target/testora }
+        with:
+          name: dependency-updates
+          path: dependency-updates.txt

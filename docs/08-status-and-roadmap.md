@@ -40,5 +40,5 @@ AI test and test-data generation, AI suggestions for missing API scenarios, requ
 1. Build and run the smoke tests. Fix any dependency alignment issues.
 2. Point `qa.yaml` at a real application. Enable and adapt `ExampleTests`.
 3. Make wait policies configurable for web, API and mobile.
-4. Add a CI job that builds and runs the smoke tests on every push, and caches `.testora/history.jsonl`.
+4. Push to GitHub and read the first CI run. Fix any compile or dependency errors it reports.
 5. Add one AI provider behind the gateway, starting with non-sensitive data.
