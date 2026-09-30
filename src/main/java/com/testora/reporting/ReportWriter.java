@@ -1,5 +1,6 @@
 package com.testora.reporting;
 
+import com.testora.api.contracts.ApiCoverage;
 import com.testora.core.utilities.Jsonl;
 import com.testora.core.utilities.Masker;
 import com.testora.execution.history.TrendAnalyzer;
@@ -38,14 +39,16 @@ public final class ReportWriter {
         groups.forEach((fp, list) -> html.append("<li><b>").append(fp).append("</b>: ").append(list.size())
                 .append(" test(s), ").append(list.get(0).category()).append(" (rule confidence ")
                 .append(list.get(0).confidence()).append(")</li>"));
-        html.append("</ul><h2>Tests</h2><table><tr><th>Test</th><th>Status</th><th>ms</th><th>Retries</th>"
+        html.append("</ul>").append(TrendAnalyzer.html()).append(ApiCoverage.html());
+        html.append("<h2>Tests</h2><table><tr><th>Test</th><th>Status</th><th>ms</th><th>Retries</th>"
                 + "<th>Recoveries</th><th>Category</th><th>Evidence</th><th>Why</th></tr>");
         for (TestSummary s : ALL) {
             html.append("<tr class='").append(s.status()).append("'><td>").append(esc(s.testId())).append("</td><td>")
                     .append(s.status()).append("</td><td>").append(s.durationMs()).append("</td><td>")
                     .append(s.retries()).append("</td><td>").append(s.recoveries()).append("</td><td>")
                     .append(s.category()).append("</td><td>").append(s.evidence().size()).append(" file(s)</td><td>")
-                    .append(esc(String.join("<br>", s.why()))).append("</td></tr>");
+                    .append(s.why().stream().map(ReportWriter::esc).collect(Collectors.joining("<br>")))
+                    .append("</td></tr>");
         }
         html.append("</table></body></html>");
         try {

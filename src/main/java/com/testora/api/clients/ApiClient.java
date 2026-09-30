@@ -1,5 +1,6 @@
 package com.testora.api.clients;
 
+import com.testora.api.contracts.ApiCoverage;
 import com.testora.core.context.TestContextHolder;
 import com.testora.core.events.EventType;
 import com.testora.core.events.Events;
