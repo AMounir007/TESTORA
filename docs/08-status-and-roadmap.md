@@ -33,13 +33,12 @@ This page is deliberately honest about what exists.
 
 ## Not implemented yet
 
-OpenAPI/contract analysis, AI test and test-data generation, requirement-to-test mapping, persisted execution history, Shadow DOM helpers, per-channel wait policies in YAML, self-generated documentation, Docker Compose for Grid and Appium, Playwright/visual/accessibility plugins, distributed workers, AI-proposed locator candidates.
+AI test and test-data generation, AI suggestions for missing API scenarios, requirement-to-test mapping, Swagger 2 and advanced OpenAPI support, Shadow DOM helpers, per-channel wait policies in YAML, self-generated documentation, Docker Compose for Grid and Appium, Playwright/visual/accessibility plugins, distributed workers, AI-proposed locator candidates, a command-line switch for history-based test selection.
 
 ## Suggested next steps
 
 1. Build and run the smoke tests. Fix any dependency alignment issues.
 2. Point `qa.yaml` at a real application. Enable and adapt `ExampleTests`.
-3. Add a persisted run history, then feed it to the flakiness and selection classes.
-4. Make wait policies configurable for web, API and mobile.
-5. Add an OpenAPI reader.
-6. Add one AI provider behind the gateway, starting with non-sensitive data.
+3. Make wait policies configurable for web, API and mobile.
+4. Add a CI job that builds and runs the smoke tests on every push, and caches `.testora/history.jsonl`.
+5. Add one AI provider behind the gateway, starting with non-sensitive data.

@@ -7,6 +7,11 @@ AI and Governance, Reports and Evidence, Troubleshooting, Status and Roadmap.
 
 Quick start: `mvn test -Dgroups=smoke` (offline platform tests, no browser or AI needed).
 
+Highlights: shared Web/API/Mobile context, central wait engine, masked evidence, failure fingerprints,
+execution history with flaky-test trends ([docs/09](docs/09-execution-history.md)),
+OpenAPI scenario generation and endpoint coverage ([docs/10](docs/10-api-contracts.md)),
+optional AI behind a gateway (off by default).
+
 ## 1. Executive overview
 TESTORA is a Java 21 platform for Web (Selenium), API (RestAssured) and Mobile (Appium) automation with one shared
 `TestContext`, one synchronization engine, one event bus, and optional AI behind a gateway.

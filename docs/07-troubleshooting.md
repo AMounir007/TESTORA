@@ -16,6 +16,11 @@
 | Recovery never happens | `recovery.enabled` is false, or no `.withFallback(...)` | Enable it and declare fallbacks |
 | Flaky failures | Shared state or real timing issue | Look for retries in the report. Check the fingerprint group. Use `-Dtestdata.seed` to rule out data differences |
 | Maven cannot resolve dependencies | Network or proxy | Configure Maven proxy in `~/.m2/settings.xml` |
+| Trends section is empty | No history yet, fewer than 5 runs, or history is lost on CI | Run the suite several times. Cache `.testora/history.jsonl` in CI. Check `history.enabled` |
+| No "API contract coverage" section | `openapi.spec` not set, or the file cannot be read | Set `-Dopenapi.spec=...`. The section shows the reason if loading fails |
+| Endpoint shows as "not called" though you call it | Path was filled in (`/customers/42`) instead of the spec template | Call `delete("/customers/{id}", id)` with path parameters |
+| `Not an OpenAPI 3 document` | Swagger 2 file or wrong file | Convert to OpenAPI 3 |
+| Generated contract scenario fails on a valid request | Missing data (404/409) or spec out of date | Review the scenario and the spec before calling it a defect |
 | Selenium / Appium version errors | Library version mismatch | Align `selenium.version` and `appium.version` in `pom.xml` (see the Appium client's required Selenium version) |
 
 ## Good bug-report checklist

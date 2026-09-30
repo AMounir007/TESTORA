@@ -42,6 +42,19 @@ To add an environment, copy `qa.yaml` to `uat.yaml` and run with `-Denv=uat`.
 | `recovery.enabled` | `false` | Turns on governed locator recovery. See [05](05-ai-and-governance.md) |
 | `testdata.seed` | random | Fixed seed for reproducible data |
 
+### History and contracts
+
+| Key | Default | Description |
+|---|---|---|
+| `history.enabled` | `true` | Record every test result |
+| `history.file` | `.testora/history.jsonl` | History location (outside `target/`) |
+| `history.window` | `20` | Recent runs per test used for trends |
+| `history.flaky.threshold` | `0.10` | Minimum failure rate to call a mixed-result test flaky |
+| `history.min.runs` | `5` | Minimum runs before flakiness is reported |
+| `openapi.spec` | empty | OpenAPI file (classpath or path). Enables the coverage section in the report |
+
+See [09](09-execution-history.md) and [10](10-api-contracts.md).
+
 ### AI and governance
 
 

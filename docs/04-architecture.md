@@ -60,8 +60,8 @@ beforeEach : create TestContext, TEST_STARTED, SETUP_STARTED
 test body  : actions publish ACTION_*, WAIT_*, RETRY_*, RECOVERY_* events
 on failure : capture evidence, classify, optional AI analysis, TEST_FAILED
 afterEach  : CLEANUP_STARTED, run cleanups (always), quit drivers,
-             TEST_PASSED, TEST_COMPLETED, write report row
-at JVM exit: write report.html, log telemetry summary
+             TEST_PASSED, TEST_COMPLETED, write report row, append to history
+at JVM exit: write report.html (with trends and API coverage), log telemetry summary
 ```
 
 ## TestContext
