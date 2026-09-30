@@ -2,6 +2,11 @@
 
 Deterministic first. Intelligent second. AI third.
 
+**Full documentation: [docs/README.md](docs/README.md)** — Getting Started, Writing Tests, Configuration, Architecture,
+AI and Governance, Reports and Evidence, Troubleshooting, Status and Roadmap.
+
+Quick start: `mvn test -Dgroups=smoke` (offline platform tests, no browser or AI needed).
+
 ## 1. Executive overview
 TESTORA is a Java 21 platform for Web (Selenium), API (RestAssured) and Mobile (Appium) automation with one shared
 `TestContext`, one synchronization engine, one event bus, and optional AI behind a gateway.
