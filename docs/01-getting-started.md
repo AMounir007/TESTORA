@@ -32,7 +32,9 @@ These tests need no browser, device or AI. They prove the core works on your mac
 mvn test -Dgroups=smoke
 ```
 
-Expected: `PlatformTest` (9 tests) passes.
+Expected: 18 tests pass (`PlatformTest` 9, `HistoryTrendTest` 1, `ContractAnalyzerTest` 3, `WaitPolicyTest` 5). `ExampleTests` is disabled and does not run.
+
+You can also run this from IntelliJ: open the **Maven** tool window, click **Reload All Maven Projects**, then double-click **clean** and **test** under TESTORA → Lifecycle.
 
 ## Run against your application
 
@@ -93,3 +95,16 @@ class MyFirstTest {
 ```
 
 No driver setup, waits, screenshots or cleanup are needed.
+
+## Try the ready-made examples
+
+Runnable Web and API examples against public practice sites are in `src/test/java/com/testora/examples/`:
+
+```
+mvn test -Dgroups=web        # WebExampleTests (the-internet.herokuapp.com)
+mvn test -Dgroups=api        # ApiExampleTests (jsonplaceholder.typicode.com)
+mvn test -Dgroups=example    # both
+```
+
+They need internet access. See [12 - Example Tests](12-example-tests.md).
+

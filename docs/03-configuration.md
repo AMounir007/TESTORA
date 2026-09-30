@@ -48,53 +48,51 @@ To add an environment, copy `qa.yaml` to `uat.yaml` and run with `-Denv=uat`.
 |---|---|---|
 | `history.enabled` | `true` | Record every test result |
 | `history.file` | `.testora/history.jsonl` | History location (outside `target/`) |
+| `history.window` | `20` | Recent runs per test used for trends |
+| `history.flaky.threshold` | `0.10` | Minimum failure rate to call a mixed-result test flaky |
+| `history.min.runs` | `5` | Minimum runs before flakiness is reported |
+| `openapi.spec` | empty | OpenAPI file (classpath or path). Enables the coverage section in the report |
 
 See [09](09-execution-history.md) and [10](10-api-contracts.md).
 
-| `openapi.spec` | empty | OpenAPI file (classpath or path). Enables the coverage section in the report |
-| `history.min.runs` | `5` | Minimum runs before flakiness is reported |
-| `history.flaky.threshold` | `0.10` | Minimum failure rate to call a mixed-result test flaky |
-| `history.window` | `20` | Recent runs per test used for trends |
 ### AI and governance
-
-
 
 | Key | Default | Description |
 |---|---|---|
 | `ai.mode` | `offline` | `normal`, `ai-unavailable` or `offline`. Only `normal` ever contacts a provider |
-Polling and API settings are read when first used in a run, so set them before the tests start.
-
-Invalid values stop the run with a clear message (for example `Invalid wait.web.timeout = 'abc'`, or polling longer than the timeout). Longer timeouts can hide real slowness, so raise them only where an environment is genuinely slower, and read the wait durations in the report.
-
-```
-wait.api.timeout: 10s
-wait.mobile.timeout: 45s
-wait.web.polling: 250ms
-wait.web.timeout: 20s
-```yaml
-
-Durations are written `300ms`, `15s` or `2m`. A plain number means seconds. Example:
-
-| `wait.web.maxStaleRecoveries` | `3` | `3` | `0` | Reserved upper bound for stale recoveries (not yet enforced separately) |
-| `wait.web.ignoreNoSuchElement` | `true` | `true` | `false` | Keep polling while the element is absent |
-| `wait.web.ignoreStale` | `true` | `true` | `false` | Re-locate stale elements while waiting |
-| `wait.web.scriptTimeout` | `30s` | `60s` | `30s` | Script execution limit (web and mobile) |
-| `wait.web.pageLoadTimeout` | `30s` | `60s` | `30s` | Browser page load limit (web only) |
-| `wait.web.polling` | `300ms` | `500ms` | `500ms` | Time between condition checks (must not exceed the timeout) |
-| `wait.web.timeout` | `15s` | `30s` | `30s` | Maximum wait for a condition. For `api`: connection and response timeout of each call |
-|---|---|---|---|---|
-| Key (replace `web` with `mobile` or `api`) | Web default | Mobile default | API default | Meaning |
-
-## Wait policy (per channel)
+| `ai.timeout.seconds` | `20` | Per-call timeout |
 | `ai.max.prompt.chars` | `8000` | Prompts are truncated to this size after masking |
 | `ai.max.calls` | `50` | Cap per run (cost control) |
 | `ai.analysis.threshold` | `0.80` | AI is asked only when rule confidence is below this |
 | `governance.auto.threshold` | `0.85` | At or above: automatic action allowed |
 | `governance.review.threshold` | `0.60` | At or above (and below auto): human review. Below: recommendation only |
 
-## Wait policy
+## Wait policy (per channel)
 
-Default web policy (in `WaitPolicy.webDefaults()`): timeout 15 s, polling 300 ms, page load 30 s, script 30 s, stale and no-such-element exceptions ignored. These values live in one place only. They are **not yet YAML-configurable**. See [08 - Status and Roadmap](08-status-and-roadmap.md).
+Synchronization settings exist separately for `web`, `mobile` and `api`. Set them in the YAML file, as environment variables or with `-D` (same precedence as every other key). Unset keys keep the defaults below.
+
+| Key (replace `web` with `mobile` or `api`) | Web default | Mobile default | API default | Meaning |
+|---|---|---|---|---|
+| `wait.web.timeout` | `15s` | `30s` | `30s` | Maximum wait for a condition. For `api`: connection and response timeout of each call |
+| `wait.web.polling` | `300ms` | `500ms` | `500ms` | Time between condition checks (must not exceed the timeout) |
+| `wait.web.pageLoadTimeout` | `30s` | `60s` | `30s` | Browser page load limit (web only) |
+| `wait.web.scriptTimeout` | `30s` | `60s` | `30s` | Script execution limit (web and mobile) |
+| `wait.web.ignoreStale` | `true` | `true` | `false` | Re-locate stale elements while waiting |
+| `wait.web.ignoreNoSuchElement` | `true` | `true` | `false` | Keep polling while the element is absent |
+| `wait.web.maxStaleRecoveries` | `3` | `3` | `0` | Reserved upper bound for stale recoveries (not yet enforced separately) |
+
+Durations are written `300ms`, `15s` or `2m`. A plain number means seconds. Example:
+
+```yaml
+wait.web.timeout: 20s
+wait.web.polling: 250ms
+wait.mobile.timeout: 45s
+wait.api.timeout: 10s
+```
+
+Invalid values stop the run with a clear message (for example `Invalid wait.web.timeout = 'abc'`, or polling longer than the timeout). Longer timeouts can hide real slowness, so raise them only where an environment is genuinely slower, and read the wait durations in the report.
+
+Wait settings are read when first used in a run, so set them before the tests start.
 
 ## Secrets
 

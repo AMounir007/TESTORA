@@ -6,7 +6,7 @@
 Deterministic first. Intelligent second. AI third.
 
 **Full documentation: [docs/README.md](docs/README.md)** — Getting Started, Writing Tests, Configuration, Architecture,
-AI and Governance, Reports and Evidence, Troubleshooting, Status and Roadmap.
+AI and Governance, Reports and Evidence, Troubleshooting, Status and Roadmap, Execution History, API Contracts, Continuous Integration, Example Tests ([docs/12](docs/12-example-tests.md): runnable Web and API examples to copy).
 
 Quick start: `mvn test -Dgroups=smoke` (offline platform tests, no browser or AI needed).
 

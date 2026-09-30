@@ -20,6 +20,7 @@ Testers write business-level steps. Drivers, waits, retries, evidence, reporting
 | See flaky tests, new vs recurring failures, hidden retries | [09 - Execution History](09-execution-history.md) |
 | Generate API tests from an OpenAPI spec, see endpoint coverage | [10 - API Contracts](10-api-contracts.md) |
 | Run tests in CI, keep history, track dependency updates | [11 - Continuous Integration](11-continuous-integration.md) |
+| Copy working example tests (Web, API) | [12 - Example Tests](12-example-tests.md) |
 
 ## Key ideas in 30 seconds
 

@@ -22,6 +22,14 @@
 | `Not an OpenAPI 3 document` | Swagger 2 file or wrong file | Convert to OpenAPI 3 |
 | Generated contract scenario fails on a valid request | Missing data (404/409) or spec out of date | Review the scenario and the spec before calling it a defect |
 | Selenium / Appium version errors | Library version mismatch | Align `selenium.version` and `appium.version` in `pom.xml` (see the Appium client's required Selenium version) |
+| `Invalid wait.web.timeout = 'abc'` (or another `wait.*` key) | Bad duration, boolean or number in a wait setting | Use `300ms`, `15s` or `2m`. Polling must not exceed the timeout. See [03](03-configuration.md) |
+| Timeouts too short on a slow environment or device | Default waits (web 15 s, mobile 30 s) are too low for that environment | Raise `wait.<channel>.timeout` for that environment only, then read the wait durations in the report |
+| API call hangs or fails with a timeout | `wait.api.timeout` (default 30 s) reached | Check the service. Raise `wait.api.timeout` only if the endpoint is legitimately slow |
+| Example tests fail with connection or timeout errors | No internet, proxy, or the public practice site is down | Open the site in a browser. Set a proxy if needed. Re-run later. They are not part of the smoke suite |
+| Example test fails on a locator or text | The third-party site changed | Inspect the page and update the locator or expected text in `WebExampleTests` |
+| `ApiExampleTests` read-after-write checks fail | JSONPlaceholder does not store writes | Expected. Use your own API to verify created data |
+| Red errors in the IDE but Maven succeeds | Stale IDE index | Maven tool window: Reload All Maven Projects. Then File, Invalidate Caches, Invalidate and Restart |
+| A source file looks scrambled (lines in reverse order) or a class is "not found" | A file was damaged by a failed edit | Restore it from Git (`git checkout -- <file>`) or ask for it to be rewritten, then run `mvn test-compile` |
 
 ## Good bug-report checklist
 

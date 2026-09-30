@@ -16,9 +16,9 @@ Everything written is passed through the masker: passwords, tokens, API keys, `A
 1. **Failure fingerprints**: each entry is one root cause and how many tests share it. Investigate groups, not individual tests.
 2. **Trends**: flaky, broken and "passed only with retries" tests, and whether a failure cause is new or recurring. See [09](09-execution-history.md).
 3. **API contract coverage**: which spec endpoints your tests never called. See [10](10-api-contracts.md).
-2. **Category and confidence**: rule-based guess. Low confidence means "look at the evidence yourself".
-3. **Retries and Recoveries**: non-zero values mean the test needed help. Review them. A passing test with retries may still hide a problem.
-4. **Why** column: human-readable explanations of waits, retries and recoveries.
+4. **Category and confidence**: rule-based guess. Low confidence means "look at the evidence yourself".
+5. **Retries and Recoveries**: non-zero values mean the test needed help. Review them. A passing test with retries may still hide a problem.
+6. **Why** column: human-readable explanations of waits, retries and recoveries.
 
 ## Evidence captured on failure
 

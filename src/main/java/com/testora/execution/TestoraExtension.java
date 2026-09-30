@@ -72,6 +72,8 @@ public final class TestoraExtension implements BeforeEachCallback, AfterEachCall
                     c == null ? "-" : c.fingerprint(), ctx.evidence(), Explainer.why(ctx.executionId()),
                     ctx.aiAnalysis().orElse("")));
             Explainer.forget(ctx.executionId());
+            HistoryStore.append(ctx.testId(), failed ? "FAILED" : "PASSED", ms, ctx.retries(), ctx.recoveries(),
+                    c == null ? "-" : c.category().name(), c == null ? "-" : c.fingerprint());
         } finally {
             TestContextHolder.clear();
         }

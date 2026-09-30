@@ -32,19 +32,25 @@ import java.util.function.Supplier;
  */
 public final class SmartElement {
     private final Supplier<WebDriver> driver;
+    private final Supplier<WaitPolicy> policy;
     private final By by;
     private final String name;
     private final List<By> fallbacks = new ArrayList<>();
 
-    private SmartElement(Supplier<WebDriver> driver, By by, String name) {
+    private SmartElement(Supplier<WebDriver> driver, Supplier<WaitPolicy> policy, By by, String name) {
         this.driver = driver;
+        this.policy = policy;
         this.by = by;
         this.name = name;
     }
 
-    public static SmartElement web(By by, String name) { return new SmartElement(DriverManager::web, by, name); }
+    public static SmartElement web(By by, String name) {
+        return new SmartElement(DriverManager::web, () -> TestoraConfig.get().webWait(), by, name);
+    }
 
-    public static SmartElement mobile(By by, String name) { return new SmartElement(DriverManager::mobile, by, name); }
+    public static SmartElement mobile(By by, String name) {
+        return new SmartElement(DriverManager::mobile, () -> TestoraConfig.get().mobileWait(), by, name);
+    }
 
     /** Declares alternative locators used only by governed Controlled Recovery (if enabled). */
     public SmartElement withFallback(By... locators) {
@@ -88,10 +94,12 @@ public final class SmartElement {
 
     public void verifyText(String expected) { act("VERIFY_TEXT", e -> e, Conditions.VISIBLE, Conditions.text(expected)); }
 
-    public void verifyInvisible() { new WaitEngine(driver.get()).waitForInvisible(by); }
+    public void verifyInvisible() { engine().waitForInvisible(by); }
 
     /** Advanced access to the raw element (synchronized for presence only). */
     public WebElement raw() { return act("RAW", e -> e); }
+
+    private WaitEngine engine() { return new WaitEngine(driver.get(), policy.get()); }
 
     private <T> T act(String operation, Function<WebElement, T> action, ElementCondition... conditions) {
         RetryPolicy retry = RetryPolicy.action();
@@ -102,34 +110,34 @@ public final class SmartElement {
         while (true) {
             attempt++;
             try {
-}
-    }
-        }
-                    .orElseThrow(() -> original);
-            return LocatorRecovery.recover(engine, operation, name, by, fallbacks, conditions)
-        } catch (SynchronizationException original) {
-            return engine.waitForElement(operation, name, by, conditions);
-        try {
-        WaitEngine engine = new WaitEngine(driver.get());
-    private WebElement resolve(String operation, ElementCondition... conditions) {
-
-    }
-        }
-            }
-                throw e;
-                Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", "SynchronizationTimeout");
-            } catch (SynchronizationException e) {
-                        "reason", e.getClass().getSimpleName(), "attempt", attempt);
-                Events.emit(EventType.RETRY_STARTED, "operation", operation, "element", name,
-                if (ctx != null) ctx.incrementRetries();
-                }
-                            + "\n  Last State: " + e.getClass().getSimpleName() + " (blocked or re-rendered)", e);
-                            + "\n  Element: " + name + "\n  Locator: " + by + "\n  Attempts: " + attempt
-                    throw new TestoraException("Element Interaction Failed\n  Operation: " + operation
-                    Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", e.getClass().getSimpleName());
-                if (attempt >= retry.maxAttempts()) {
-            } catch (ElementClickInterceptedException | StaleElementReferenceException e) {
-                return result;
-                Events.emit(EventType.ACTION_COMPLETED, "operation", operation, "element", name, "attempt", attempt);
-                T result = action.apply(element);
                 WebElement element = resolve(operation, conditions);
+                T result = action.apply(element);
+                Events.emit(EventType.ACTION_COMPLETED, "operation", operation, "element", name, "attempt", attempt);
+                return result;
+            } catch (ElementClickInterceptedException | StaleElementReferenceException e) {
+                if (attempt >= retry.maxAttempts()) {
+                    Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", e.getClass().getSimpleName());
+                    throw new TestoraException("Element Interaction Failed\n  Operation: " + operation
+                            + "\n  Element: " + name + "\n  Locator: " + by + "\n  Attempts: " + attempt
+                            + "\n  Last State: " + e.getClass().getSimpleName() + " (blocked or re-rendered)", e);
+                }
+                if (ctx != null) ctx.incrementRetries();
+                Events.emit(EventType.RETRY_STARTED, "operation", operation, "element", name,
+                        "reason", e.getClass().getSimpleName(), "attempt", attempt);
+            } catch (SynchronizationException e) {
+                Events.emit(EventType.ACTION_FAILED, "operation", operation, "element", name, "reason", "SynchronizationTimeout");
+                throw e;
+            }
+        }
+    }
+
+    private WebElement resolve(String operation, ElementCondition... conditions) {
+        WaitEngine engine = engine();
+        try {
+            return engine.waitForElement(operation, name, by, conditions);
+        } catch (SynchronizationException original) {
+            return LocatorRecovery.recover(engine, operation, name, by, fallbacks, conditions)
+                    .orElseThrow(() -> original);
+        }
+    }
+}

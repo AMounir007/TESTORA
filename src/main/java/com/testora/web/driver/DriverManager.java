@@ -34,11 +34,15 @@ public final class DriverManager {
         if (driver == null) {
             long start = System.nanoTime();
             driver = MobileDriverFactory.create();
-            var mobilePolicy = com.testora.config.TestoraConfig.get().mobileWait();
-            driver.manage().timeouts().scriptTimeout(mobilePolicy.scriptTimeout());
-            Metrics.recordDriverCreation((System.nanoTime() - start) / 1_000_000);
             MOBILE.set(driver);
             CleanupRegistry.register(() -> quit(MOBILE));
+            try {
+                driver.manage().timeouts().scriptTimeout(
+                        com.testora.config.TestoraConfig.get().mobileWait().scriptTimeout());
+            } catch (RuntimeException unsupported) {
+                // Native app sessions may not support script timeouts; this setting is best effort.
+            }
+            Metrics.recordDriverCreation((System.nanoTime() - start) / 1_000_000);
         }
         return driver;
     }

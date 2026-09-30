@@ -11,6 +11,9 @@
 
 ## Which pattern should I use?
 
+Working code for most of the patterns below is in [12 - Example Tests](12-example-tests.md).
+
+
 | Pattern | Use it when | Base class |
 |---|---|---|
 | **Page Object** | A whole screen or page with its own URL | `BasePage` |
