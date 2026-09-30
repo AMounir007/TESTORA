@@ -89,6 +89,7 @@ public class ApiClient {
     private Response record(Method method, String path, Response response) {
         long ms = response.time();
         Metrics.recordApi(ms);
+        ApiCoverage.record(method.name(), path);
         Events.emit(EventType.ACTION_COMPLETED, "operation", "API " + method + " " + path,
                 "status", response.statusCode(), "durationMs", ms);
         Map<String, String> requestHeaders = new LinkedHashMap<>(headers);
