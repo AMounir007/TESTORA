@@ -44,6 +44,8 @@ To add an environment, copy `qa.yaml` to `uat.yaml` and run with `-Denv=uat`.
 
 ### AI and governance
 
+
+
 | Key | Default | Description |
 |---|---|---|
 | `ai.mode` | `offline` | `normal`, `ai-unavailable` or `offline`. Only `normal` ever contacts a provider |

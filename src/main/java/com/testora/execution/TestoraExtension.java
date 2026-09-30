@@ -8,6 +8,7 @@ import com.testora.core.events.EventType;
 import com.testora.core.lifecycle.Testora;
 import com.testora.config.TestoraConfig;
 import com.testora.evidence.EvidenceService;
+import com.testora.execution.history.HistoryStore;
 import com.testora.intelligence.fingerprinting.FailureClassifier;
 import com.testora.intelligence.fingerprinting.FailureClassifier.Classification;
 import com.testora.observability.Explainer;

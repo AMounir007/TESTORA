@@ -2,6 +2,7 @@ package com.testora.reporting;
 
 import com.testora.core.utilities.Jsonl;
 import com.testora.core.utilities.Masker;
+import com.testora.execution.history.TrendAnalyzer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

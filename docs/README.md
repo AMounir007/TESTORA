@@ -17,6 +17,7 @@ Testers write business-level steps. Drivers, waits, retries, evidence, reporting
 | Read reports, evidence and "why" explanations | [06 - Reports and Evidence](06-reports-and-evidence.md) |
 | Fix a problem | [07 - Troubleshooting](07-troubleshooting.md) |
 | Know what is and is not built yet | [08 - Status and Roadmap](08-status-and-roadmap.md) |
+| See flaky tests, new vs recurring failures, hidden retries | [09 - Execution History](09-execution-history.md) |
 
 ## Key ideas in 30 seconds
 
