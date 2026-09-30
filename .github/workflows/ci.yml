@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload TESTORA report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: testora-report
           path: target/testora
@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload surefire reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: surefire-reports
           path: target/surefire-reports
@@ -70,7 +70,7 @@ jobs:
       - name: Show available dependency and plugin updates
         run: |
           mvn -B -ntp versions:display-property-updates versions:display-dependency-updates | tee dependency-updates.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dependency-updates
           path: dependency-updates.txt
