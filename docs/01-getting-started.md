@@ -96,6 +96,21 @@ class MyFirstTest {
 
 No driver setup, waits, screenshots or cleanup are needed.
 
+## How to start automating your application
+
+Follow these steps in order. Each one links to the detailed guide.
+
+1. **Pick what to automate first.** Start with 3-5 stable, high-value flows (login, create a record, search). Prefer API checks where possible because they are fastest and least flaky; add Web or Mobile checks for what users actually see.
+2. **Point the framework at your app.** Set `base.url` and `api.base.url` in `config/qa.yaml` and export secrets as environment variables (see [Run against your application](#run-against-your-application) and [03 - Configuration](03-configuration.md)).
+3. **Choose a pattern.** Page Object for a page, Component Object for a reusable widget, API Client Object for a service (see [02 - Writing Tests](02-writing-tests.md#which-pattern-should-i-use)).
+4. **Write one small test.** Annotate the class with `@Testora`, tag it (`smoke`, `web`, `api`...), and use `SmartElement` or an API client. Do not add drivers, waits or screenshots. Follow the [Golden rules](02-writing-tests.md#golden-rules).
+5. **Run it locally.** `mvn test -Denv=qa -Dgroups=smoke`, then open `target/testora/report.html` ([06 - Reports and Evidence](06-reports-and-evidence.md)).
+6. **Make it reliable.** Run it several times; fix any failure before adding more tests. Keep tests independent, with their own test data.
+7. **Grow gradually.** Add one flow at a time, then cross-channel (API, then Web, then Mobile) tests once the basics are stable.
+8. **Run it in CI.** Run the `smoke` suite on every push and the full regression nightly (see [11 - Continuous Integration](11-continuous-integration.md)).
+
+If something fails, see [07 - Troubleshooting](07-troubleshooting.md).
+
 ## Try the ready-made examples
 
 Runnable Web and API examples against public practice sites are in `src/test/java/com/testora/examples/`:
@@ -107,4 +122,3 @@ mvn test -Dgroups=example    # both
 ```
 
 They need internet access. See [12 - Example Tests](12-example-tests.md).
-
