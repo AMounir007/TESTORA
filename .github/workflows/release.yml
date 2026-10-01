@@ -1,0 +1,53 @@
+name: Release
+
+# Runs on every push to main; builds, tags v<run_number> and publishes a GitHub Release.
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create tag + release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compute dynamic version
+        id: ver
+        run: echo "version=v${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test
+        run: mvn -B -ntp clean verify -Dsuite=smoke
+
+      - name: Package
+        run: |
+          mkdir -p dist
+          cp target/*.jar dist/ 2>/dev/null || true
+          zip -r "dist/testora-${{ steps.ver.outputs.version }}.zip" src pom.xml README.md docs
+
+      - name: Create release (release notes auto-generated)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.ver.outputs.version }}" dist/* \
+            --target "${{ github.sha }}" \
+            --title "${{ steps.ver.outputs.version }}" \
+            --generate-notes
