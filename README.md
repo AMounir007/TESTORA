@@ -28,8 +28,20 @@ Deterministic first. Intelligent second. AI third.
 ## Releasing
 
 Releases are automatic. Every push to `main` or `master` runs `.github/workflows/release.yml`, which bumps the patch version
-(1.0.0 → 1.0.1 → …), commits `pom.xml` with `[skip ci]`, creates the tag (no `v` prefix), publishes a GitHub Release
-(notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, otherwise auto-generated) and triggers JitPack.
+(1.0.0 → 1.0.1 → …), commits `pom.xml` and `CHANGELOG.md` with `[skip ci]`, creates the tag (no `v` prefix), publishes a
+GitHub Release and triggers JitPack.
+
+**Release notes (what followers see in their GitHub feed).** Before pushing, describe the change under `## [Unreleased]`
+in `CHANGELOG.md` (Overview, Added, Fixed, Security, Changed, Breaking, Why it matters). Each release then shows:
+
+- a title built from the Overview, e.g. `TESTORA 1.0.3 — Faster waits for slow pages`;
+- an **At a glance** block (what's new, fixed, security, why it matters, upgrade impact: breaking / security / bug-fix / drop-in),
+  which is what the feed preview displays;
+- the full categorized changes, the list of commits, a Maven/Gradle install snippet and a compare link.
+
+If `[Unreleased]` is empty, notes are grouped from Conventional Commit messages (`feat:`, `fix:`, `security:`, `perf:`, `docs:`;
+`feat!:` = breaking). To rewrite notes of an existing release, run **Actions → Refresh release notes** with its tag.
+
 To start from a higher number, change `BASE_VERSION` in the workflow. If a release fails, fix the cause, delete the tag
 (`git push origin :refs/tags/<version>`) and the GitHub Release, then push again.
 

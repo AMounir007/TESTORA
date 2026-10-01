@@ -1,9 +1,10 @@
 name: Release
 
-# Every push to main: bump patch version -> update pom.xml -> commit [skip ci] -> tag -> GitHub Release -> JitPack build.
+# Every push to main/master: bump patch version -> update pom.xml + CHANGELOG.md -> commit [skip ci] -> tag
+# -> GitHub Release with user-focused notes (what followers see in their feed) -> JitPack build.
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 # Only one release at a time; never cancel a release that is half-way through.
@@ -62,6 +63,7 @@ jobs:
           done
           echo "Latest tag: ${LATEST:-none} -> releasing $VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "prev=$LATEST" >> "$GITHUB_OUTPUT"
 
       - name: Set version in pom.xml
         run: >
@@ -71,43 +73,31 @@ jobs:
       - name: Build (verify it compiles and installs)
         run: mvn -B -ntp clean install -DskipTests
 
+      - name: Generate release notes and stamp CHANGELOG.md
+        id: notes
+        run: |
+          bash .github/scripts/release-notes.sh '${{ steps.ver.outputs.version }}' '${{ steps.ver.outputs.prev }}' '${{ github.repository }}'
+          echo "title=$(cat release-title.txt)" >> "$GITHUB_OUTPUT"
+
       - name: Commit version and tag
         run: |
           set -euo pipefail
           VERSION='${{ steps.ver.outputs.version }}'
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pom.xml
-          git commit -m "chore(release): $VERSION [skip ci]" || echo "pom.xml already at $VERSION"
+          git add pom.xml CHANGELOG.md
+          git commit -m "chore(release): $VERSION [skip ci]" || echo "Nothing to commit for $VERSION"
           git tag -a "$VERSION" -m "Release $VERSION"
           git push origin "HEAD:${{ github.ref_name }}"
           git push origin "$VERSION"
-
-      - name: Extract release notes from CHANGELOG.md
-        id: notes
-        run: |
-          VERSION='${{ steps.ver.outputs.version }}'
-          : > release-notes.md
-          if [ -f CHANGELOG.md ]; then
-            awk -v v="$VERSION" '
-              $0 ~ "^## \\[" v "\\]" { found=1; next }
-              found && /^## \[/      { exit }
-              found                  { print }
-            ' CHANGELOG.md > release-notes.md
-          fi
-          if grep -q '[^[:space:]]' release-notes.md; then
-            echo "has_notes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_notes=false" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.version }}
-          name: ${{ steps.ver.outputs.version }}
-          body_path: ${{ steps.notes.outputs.has_notes == 'true' && 'release-notes.md' || '' }}
-          generate_release_notes: ${{ steps.notes.outputs.has_notes != 'true' }}
+          name: ${{ steps.notes.outputs.title }}
+          body_path: release-notes.md
+          make_latest: true
 
       - name: Trigger JitPack build and wait
         run: |

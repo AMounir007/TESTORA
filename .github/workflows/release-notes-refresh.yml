@@ -1,0 +1,33 @@
+name: Refresh release notes
+
+# Manually rebuild the notes of an existing release (e.g. after improving CHANGELOG.md or this format).
+# Actions -> "Refresh release notes" -> Run workflow -> enter the tag (e.g. 1.0.0).
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to refresh (e.g. 1.0.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+
+      - name: Rebuild notes and update the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release edit "$TAG" --title "$(cat release-title.txt)" --notes-file release-notes.md
+          bash .github/scripts/release-notes.sh "$TAG" "$PREV" "${{ github.repository }}"
+          PREV=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=v:refname | awk -v t="$TAG" '$0==t{print p; exit} {p=$0}')
+          git fetch --tags --force

@@ -1,19 +1,33 @@
 # Changelog
 
-All notable changes are documented here. The release workflow uses the section matching the version
-(`## [x.y.z]`) as the GitHub Release notes; if none exists, notes are auto-generated.
+All notable changes to TESTORA are documented here.
 
-## [1.0.0]
+**How releases use this file:** write your changes under `## [Unreleased]` before you push.
+On every push the release workflow turns that section into the GitHub Release notes (what followers see in their feed),
+renames it to `## [x.y.z] - date`, and adds a fresh empty template on top. Empty headings are dropped automatically.
+If `[Unreleased]` is empty, notes are built from commit messages, so use Conventional Commits:
+`feat: ...`, `fix: ...`, `security: ...`, `perf: ...`, `docs: ...`, `ci: ...` (add `!` for breaking changes, e.g. `feat!: ...`).
+
+## [Unreleased]
+
+### Overview
+Versioned releases on JitPack and security-hardened dependencies
 
 ### Added
-- Automatic release pipeline: every push to `main` bumps the patch version, updates `pom.xml`, tags (no `v` prefix),
-  publishes a GitHub Release and triggers a JitPack build.
-- JitPack support (`jitpack.yml`, sources and javadoc jars).
-- Documentation: "How to start automating your application" (docs/01), code and security review (docs/13).
+- **Use TESTORA as a dependency** from any Maven or Gradle project through JitPack (sources and javadoc included).
+- **Automatic releases:** every push gets a version number, a tag, release notes and a JitPack build, with no manual steps.
+- **New guide:** "How to start automating your application" (docs/01), a step-by-step path from first test to CI.
+- **Code and security review** of the platform (docs/13).
 
 ### Security
-- Upgraded Appium java-client to 10.1.1, Jackson to 2.18.11, Logback to 1.5.19, AssertJ to 3.27.7.
-- Pinned `commons-lang3` 3.18.0 and `logback-core` to fixed versions.
+- Appium java-client 9.3.0 → 10.1.1: blocks redirection of session traffic through `directConnect` (GHSA-28f5-38xr-jh2w).
+- Jackson 2.18.2 → 2.18.11: fixes several deserialization and denial-of-service issues.
+- Logback 1.5.12 → 1.5.19 (classic and core): fixes expression-injection and code-execution issues in configuration processing.
+- AssertJ 3.26.3 → 3.27.7: fixes XXE in `isXmlEqualTo`.
+- commons-lang3 pinned to 3.18.0: fixes uncontrolled recursion on long inputs.
 
 ### Changed
-- `groupId` is now `com.github.AMounir007` (matches JitPack coordinates).
+- Maven coordinates are now `com.github.AMounir007:TESTORA` to match JitPack.
+
+### Why it matters
+- Teams pin an exact, traceable TESTORA version instead of copying source, and test runs no longer pull in libraries with known vulnerabilities.
