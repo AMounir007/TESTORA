@@ -3,7 +3,36 @@
 [![testora](https://github.com/AMounir007/TESTORA/actions/workflows/ci.yml/badge.svg)](https://github.com/AMounir007/TESTORA/actions/workflows/ci.yml)
 
 
+[![Release](https://github.com/AMounir007/TESTORA/actions/workflows/release.yml/badge.svg)](https://github.com/AMounir007/TESTORA/actions/workflows/release.yml)
+[![JitPack](https://jitpack.io/v/AMounir007/TESTORA.svg)](https://jitpack.io/#AMounir007/TESTORA)
+
 Deterministic first. Intelligent second. AI third.
+
+## Use as a dependency (JitPack)
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.github.AMounir007</groupId>
+  <artifactId>TESTORA</artifactId>
+  <version>1.0.0</version> <!-- use the latest release tag -->
+</dependency>
+```
+
+## Releasing
+
+Releases are automatic. Every push to `main` runs `.github/workflows/release.yml`, which bumps the patch version
+(1.0.0 → 1.0.1 → …), commits `pom.xml` with `[skip ci]`, creates the tag (no `v` prefix), publishes a GitHub Release
+(notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, otherwise auto-generated) and triggers JitPack.
+To start from a higher number, change `BASE_VERSION` in the workflow. If a release fails, fix the cause, delete the tag
+(`git push origin :refs/tags/<version>`) and the GitHub Release, then push again.
+
 
 **Full documentation: [docs/README.md](docs/README.md)** — Getting Started, Writing Tests, Configuration, Architecture,
 AI and Governance, Reports and Evidence, Troubleshooting, Status and Roadmap, Execution History, API Contracts, Continuous Integration, Example Tests ([docs/12](docs/12-example-tests.md): runnable Web and API examples to copy).

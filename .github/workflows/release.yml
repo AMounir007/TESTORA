@@ -1,24 +1,32 @@
 name: Release
 
-# Runs on every push to main; builds, tags v<run_number> and publishes a GitHub Release.
+# Every push to main: bump patch version -> update pom.xml -> commit [skip ci] -> tag -> GitHub Release -> JitPack build.
 on:
   push:
     branches: [ main ]
-    paths-ignore:
-      - '**/*.md'
+  workflow_dispatch:
 
+# Only one release at a time; never cancel a release that is half-way through.
 concurrency:
   group: release
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
+
+env:
+  BASE_VERSION: 1.0.0            # first version to release when no tag exists (or latest tag is lower)
+  JITPACK_GROUP: com.github.AMounir007
+  JITPACK_ARTIFACT: TESTORA
 
 jobs:
   release:
+    # Loop guard: ignore our own release commits and the bot itself.
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
-    permissions:
-      contents: write   # needed to create tag + release
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,24 +38,91 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Compute dynamic version
+      - name: Compute next version
         id: ver
-        run: echo "version=v${{ github.run_number }}" >> "$GITHUB_OUTPUT"
-
-      - name: Build and test
-        run: mvn -B -ntp clean verify -Dsuite=smoke
-
-      - name: Package
         run: |
-          mkdir -p dist
-          cp target/*.jar dist/ 2>/dev/null || true
-          zip -r "dist/testora-${{ steps.ver.outputs.version }}.zip" src pom.xml README.md docs
+          set -euo pipefail
+          git fetch --tags --force
+          LATEST=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1 || true)
+          if [ -z "$LATEST" ]; then
+            VERSION="$BASE_VERSION"
+          else
+            HIGHEST=$(printf '%s\n%s\n' "$LATEST" "$BASE_VERSION" | sort -V | tail -n 1)
+            if [ "$HIGHEST" = "$BASE_VERSION" ] && [ "$LATEST" != "$BASE_VERSION" ]; then
+              VERSION="$BASE_VERSION"
+            else
+              IFS=. read -r MAJOR MINOR PATCH <<< "$LATEST"
+              VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+            fi
+          fi
+          # Never reuse an existing tag.
+          while git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; do
+            IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
+            VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          done
+          echo "Latest tag: ${LATEST:-none} -> releasing $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Create release (release notes auto-generated)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set version in pom.xml
+        run: >
+          mvn -B -ntp org.codehaus.mojo:versions-maven-plugin:2.17.1:set
+          -DnewVersion=${{ steps.ver.outputs.version }} -DgenerateBackupPoms=false
+
+      - name: Build (verify it compiles and installs)
+        run: mvn -B -ntp clean install -DskipTests
+
+      - name: Commit version and tag
         run: |
-          gh release create "${{ steps.ver.outputs.version }}" dist/* \
-            --target "${{ github.sha }}" \
-            --title "${{ steps.ver.outputs.version }}" \
-            --generate-notes
+          set -euo pipefail
+          VERSION='${{ steps.ver.outputs.version }}'
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pom.xml
+          git commit -m "chore(release): $VERSION [skip ci]" || echo "pom.xml already at $VERSION"
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin HEAD:main
+          git push origin "$VERSION"
+
+      - name: Extract release notes from CHANGELOG.md
+        id: notes
+        run: |
+          VERSION='${{ steps.ver.outputs.version }}'
+          : > release-notes.md
+          if [ -f CHANGELOG.md ]; then
+            awk -v v="$VERSION" '
+              $0 ~ "^## \\[" v "\\]" { found=1; next }
+              found && /^## \[/      { exit }
+              found                  { print }
+            ' CHANGELOG.md > release-notes.md
+          fi
+          if grep -q '[^[:space:]]' release-notes.md; then
+            echo "has_notes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_notes=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.version }}
+          name: ${{ steps.ver.outputs.version }}
+          body_path: ${{ steps.notes.outputs.has_notes == 'true' && 'release-notes.md' || '' }}
+          generate_release_notes: ${{ steps.notes.outputs.has_notes != 'true' }}
+
+      - name: Trigger JitPack build and wait
+        run: |
+          VERSION='${{ steps.ver.outputs.version }}'
+          URL="https://jitpack.io/api/builds/${JITPACK_GROUP}/${JITPACK_ARTIFACT}/${VERSION}"
+          echo "JitPack: $URL"
+          for i in $(seq 1 60); do
+            CODE=$(curl -sS -o jitpack.json -w '%{http_code}' "$URL" || echo 000)
+            STATUS=$(jq -r '.status // empty' jitpack.json 2>/dev/null || true)
+            echo "[$i/60] http=$CODE status=${STATUS:-pending}"
+            case "$STATUS" in
+              ok)    echo "JitPack build succeeded."; exit 0 ;;
+              error) echo "JitPack build FAILED. Log: https://jitpack.io/com/github/AMounir007/${JITPACK_ARTIFACT}/${VERSION}/build.log"; exit 1 ;;
+            esac
+            sleep 20
+          done
+          echo "Timed out waiting for JitPack (20 min). Check https://jitpack.io/#AMounir007/${JITPACK_ARTIFACT}/${VERSION}"
+          exit 1
