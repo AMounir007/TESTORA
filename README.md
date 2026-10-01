@@ -27,7 +27,7 @@ Deterministic first. Intelligent second. AI third.
 
 ## Releasing
 
-Releases are automatic. Every push to `main` runs `.github/workflows/release.yml`, which bumps the patch version
+Releases are automatic. Every push to `main` or `master` runs `.github/workflows/release.yml`, which bumps the patch version
 (1.0.0 → 1.0.1 → …), commits `pom.xml` with `[skip ci]`, creates the tag (no `v` prefix), publishes a GitHub Release
 (notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, otherwise auto-generated) and triggers JitPack.
 To start from a higher number, change `BASE_VERSION` in the workflow. If a release fails, fix the cause, delete the tag

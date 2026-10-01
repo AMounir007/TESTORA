@@ -80,7 +80,7 @@ jobs:
           git add pom.xml
           git commit -m "chore(release): $VERSION [skip ci]" || echo "pom.xml already at $VERSION"
           git tag -a "$VERSION" -m "Release $VERSION"
-          git push origin HEAD:main
+          git push origin "HEAD:${{ github.ref_name }}"
           git push origin "$VERSION"
 
       - name: Extract release notes from CHANGELOG.md
