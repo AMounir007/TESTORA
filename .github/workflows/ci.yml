@@ -22,7 +22,7 @@ jobs:
 
       # Keep execution history between runs so flaky/trend analysis works in CI.
       - name: Restore history
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .testora
           key: testora-history-${{ github.ref_name }}-${{ github.run_id }}
@@ -36,7 +36,7 @@ jobs:
 
       - name: Save history
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .testora
           key: testora-history-${{ github.ref_name }}-${{ github.run_id }}
